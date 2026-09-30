@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考生档案 | 心理评估报告 | 全国青少年学术竞赛评估中心</title>
+    <style>
+        /* ================= 全局与浏览器外壳 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
+        #browser { width: 1100px; height: 850px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        
+        /* 浏览器顶栏 */
+        .browser-top { background: #2d2d2d; height: 40px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #444; }
+        .browser-dots { display: flex; gap: 6px; }
+        .browser-dots span { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
+        .browser-dots span:nth-child(2) { background: #ffbd2e; }
+        .browser-dots span:nth-child(3) { background: #27c93f; }
+        .url-bar { flex: 1; background: #1a1a1a; height: 26px; margin-left: 20px; border-radius: 4px; border: 1px solid #444; font-size: 12px; color: #00aaff; display: flex; align-items: center; padding: 0 10px; font-family: monospace; }
+        
+        /* ================= 红白官方风 ================= */
+        .viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #fff; position: relative; transition: opacity 0.5s ease; }
+        .header { background: #cc0000; color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .header-logo .circle { background: #fff; color: #cc0000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .header-nav { display: flex; gap: 25px; font-size: 14px; }
+        .header-nav a { color: #fff; text-decoration: none; cursor: pointer; padding: 5px; transition: 0.3s; }
+        .header-nav a:hover { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        .notice { background: #fff3cd; color: #856404; text-align: center; padding: 8px; font-size: 13px; border-bottom: 1px solid #ffeeba; cursor: pointer; }
+        .notice strong { color: #cc0000; }
+        .breadcrumbs { background: #f9f9f9; padding: 10px 30px; font-size: 12px; color: #666; border-bottom: 1px solid #ddd; }
+        .layout { display: flex; flex: 1; }
+        .main-content { flex: 3; padding: 30px; border-right: 1px solid #eee; }
+        .sidebar { flex: 1; background: #fafafa; padding: 20px; }
+        .sidebar-title { background: #cc0000; color: #fff; padding: 10px; font-size: 14px; font-weight: bold; margin-bottom: 15px; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; color: #333; cursor: pointer; transition: 0.2s; }
+        .sidebar li:hover { color: #cc0000; background: #fff0f0; padding-left: 5px; }
+        .sidebar li::before { content: '►'; color: #cc0000; font-size: 10px; margin-right: 8px; }
+
+        .page-title { color: #cc0000; font-size: 24px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #cc0000; }
+        
+        /* 报告正文 */
+        .report-box { background: #fdfdfd; border: 1px solid #ccc; padding: 25px; font-size: 14px; line-height: 2; color: #333; border-left: 4px solid #cc0000; }
+        .report-box p { margin-bottom: 12px; text-indent: 2em; }
+        .report-header { font-weight: bold; color: #cc0000; text-indent: 0 !important; margin-bottom: 15px; }
+
+        /* 活动轨迹表格 */
+        .track-list { margin-top: 30px; background:#fff; border:1px solid #ddd; font-size:14px; line-height:2.2; }
+        .track-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 10px 15px; }
+        .track-item:last-child { border-bottom: none; }
+        .track-status-normal { color: #27c93f; }
+        .track-status-danger { color: #cc0000; font-weight: bold; cursor: pointer; transition: 0.3s; padding: 0 5px; border-bottom: 1px dashed #cc0000; }
+        .track-status-danger:hover { background-color: #fff0f0; border-radius: 3px; }
+
+        /* 隐藏日记框 */
+        .diary-box { display: none; background: #fff9f9; border: 2px dashed #cc0000; padding: 25px; margin-top: 20px; box-shadow: 0 5px 15px rgba(204,0,0,0.05); animation: fadeIn 0.5s; }
+        .diary-box h3 { color: #cc0000; font-size: 16px; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; }
+        .diary-box p { font-size: 15px; line-height: 2.2; color: #333; margin-bottom: 8px; font-style: italic; }
+        .diary-box .highlight-first { color: #cc0000; font-weight: bold; font-size: 18px; }
+
+        /* 密码破解区 (藏头诗解谜) */
+        .password-area { display: none; margin-top: 20px; padding: 20px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 4px; }
+        .password-area input { padding: 10px; font-size: 16px; width: 250px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; }
+        .password-area button { padding: 10px 20px; background: #cc0000; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; margin-left: 10px; font-weight: bold; }
+        .password-area button:hover { background: #aa0000; }
+
+        /* 全局提示框 */
+        .toast { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 12px 25px; border-radius: 6px; font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: transform 0.4s ease, opacity 0.4s; z-index: 200; border-left: 4px solid #cc0000; max-width: 600px; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div id="browser">
+    <div class="browser-top">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="url-bar">https://www.yacac.org.cn/history/linzhiyi</div>
+    </div>
+    
+    <div class="viewport" id="viewport">
+        <!-- 官网头部 -->
+        <div class="header">
+            <div class="header-logo"><div class="circle">Y</div> 全国青少年学术竞赛评估中心</div>
+            <div class="header-nav">
+                <a onclick="clickNav('首页')">首页</a>
+                <a onclick="clickNav('关于YACAC')">关于YACAC</a>
+                <a style="color:#ffd700;" onclick="clickNav('报名记录')">报名记录</a>
+                <a onclick="clickNav('联系我们')">联系我们</a>
+            </div>
+        </div>
+        
+        <div class="notice" onclick="showToast('【系统警告】系统检测到您正在访问受保护的心理评估报告。请勿将此页面内容泄露给第三方。')">
+            <strong>[安全警告]</strong> 您正在访问加密的考生心理评估档案。所有操作均会被系统记录。
+        </div>
+        <div class="breadcrumbs">Home > 考生档案 > 林知易 > 心理评估报告</div>
+
+        <div class="layout">
+            <!-- 左侧主内容 -->
+            <div class="main-content">
+                <div class="page-title">考生档案：林知易 | 心理评估报告</div>
+                
+                <div class="report-box">
+                    <p class="report-header">【系统自动评估报告 - 密级：机密】</p>
+                    <p>考生姓名：林知易 | 学号：20230101 | 评估日期：2026-05-21</p>
+                    <p>本系统综合该生近半年的竞赛表现、在校出勤率及日常行为轨迹，生成以下评估结论：</p>
+                    <p>该生长期处于极高度紧张状态，具有明显的完美主义倾向。近期表现出强烈的逃避心理和情绪耗竭（Burnout）症状。建议家长及校方密切关注该生心理状态，必要时介入干预。</p>
+                    <p>以下附录为该生在系统内提交的匿名日记片段，供心理老师参考：</p>
+                </div>
+
+                <!-- 活动轨迹列表（超链接解谜起点） -->
+                <div style="margin-top:30px;">
+                    <div class="page-title" style="font-size:18px; border-bottom:1px solid #ccc; padding-bottom:5px;">异常活动轨迹记录</div>
+                    <div class="track-list">
+                        <div class="track-item">
+                            <span>2026-05-15 09:00 - 12:00 | 数学国初赛模拟考</span>
+                            <span class="track-status-normal">状态：正常</span>
+                        </div>
+                        <!-- 隐藏超链接：点击日期或状态 -->
+                        <div class="track-item">
+                            <span>2026-05-20 03:15 - 04:30 | 访问[匿名心理评估系统]</span>
+                            <span class="track-status-danger" onclick="showDiary()">状态：异常 (点击查看详情)</span>
+                        </div>
+                        <div class="track-item">
+                            <span>2026-05-25 14:00 - 18:00 | 信息学奥赛集训</span>
+                            <span class="track-status-normal">状态：正常</span>
+                        </div>
+                        <div class="track-item">
+                            <span>2026-06-01 09:00 - 11:00 | 数学国初赛</span>
+                            <span style="color:#cc0000; font-weight:bold;">状态：缺考</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 隐藏日记框（藏头诗载体） -->
+                <div class="diary-box" id="diaryBox">
+                    <h3>⚠️ 截获的匿名日记片段</h3>
+                    <p><span class="highlight-first">飞</span>鸟掠过海面，我很羡慕它们能自由飞翔。</p>
+                    <p><span class="highlight-first">猪</span>一样的我，却只能被关在教室里拼命刷题。</p>
+                    <p><span class="highlight-first">旅</span>行的意义，或许就是让我暂时逃离这一切。</p>
+                    <p><span class="highlight-first">行</span>走在无人的荒岛，我才能感受到一丝喘息的空间。</p>
+                    
+                    <p style="margin-top:20px; color:#666; font-size:13px; font-style:normal; border-top:1px dashed #ccc; padding-top:15px;">
+                        <em>陆明瑶的独白：“这是他写的藏头诗吗？每句话的第一个字连起来是……‘飞猪旅行’？他什么时候想去旅游了？”</em>
+                    </p>
+                </div>
+
+                <!-- 密码破解区（藏头诗解谜） -->
+                <div class="password-area" id="passwordArea">
+                    <h3 style="color:#cc0000; margin-bottom:10px;">🔐 提取日记中的关键信息</h3>
+                    <p style="font-size:13px; color:#666; margin-bottom:15px;">请将日记每句的第一个字连起来，输入解锁密码（4个字）。</p>
+                    <input type="text" id="passwordInput" placeholder="请输入4字密码" onkeydown="if(event.key === 'Enter') checkPassword()">
+                    <button onclick="checkPassword()">解锁</button>
+                    <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">密码错误，请仔细阅读日记片段。</p>
+                </div>
+            </div>
+
+            <!-- 右侧侧边栏 -->
+            <div class="sidebar">
+                <div class="sidebar-title">目录 | Contents</div>
+                <ul>
+                    <li onclick="clickSidebar('合格发表')">合格发表</li>
+                    <li onclick="clickSidebar('合格点')">合格点</li>
+                    <li onclick="clickSidebar('结果报告书')">结果报告书</li>
+                    <li onclick="clickSidebar('考生历史轨迹')">考生历史轨迹</li>
+                    <li onclick="clickSidebar('心理评估报告')" style="color:#cc0000; font-weight:bold;">心理评估报告 (当前页面)</li>
+                </ul>
+
+                <div class="ad-box" style="margin-top:20px; cursor:pointer;" onclick="showToast('陆明瑶：“这些广告还在贩卖焦虑，真的够了。”')">
+                    <div style="font-size:30px; margin-bottom:10px;">📈</div>
+                    <div class="ad-text" style="color:#cc0000;">一分干掉千人</div>
+                    <div class="ad-sub">你不努力，别人就会超越你</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局提示 -->
+    <div class="toast" id="toast"></div>
+</div>
+
+<script>
+    // ================= 通用提示框 =================
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        if (window.toastTimer) clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    // ================= 顶部导航点击 =================
+    function clickNav(name) {
+        if (name === '报名记录') {
+            showToast('【系统提示】您当前已在报名记录页面。');
+        } else if (name === '首页') {
+            showToast('【系统提示】正在返回首页。请先完成当前页面的信息提取。');
+        } else if (name === '关于YACAC') {
+            showToast('【系统提示】YACAC致力于为国家培养顶尖创新人才。');
+        } else if (name === '联系我们') {
+            showToast('【系统提示】联系电话：400-XXX-XXXX。邮箱：yacac@edu.cn。');
+        }
+    }
+
+    // ================= 侧边栏点击 =================
+    function clickSidebar(name) {
+        if (name === '心理评估报告') {
+            showToast('【系统提示】您当前已处于心理评估报告页面。');
+        } else {
+            showToast(`【系统提示】您正在访问：${name}。该模块暂未开放，请先完成心理评估报告。`);
+        }
+    }
+
+    // ================= 超链接解谜：点击活动轨迹异常状态 =================
+    function showDiary() {
+        const diaryBox = document.getElementById('diaryBox');
+        const passwordArea = document.getElementById('passwordArea');
+        
+        // 显示日记框
+        diaryBox.style.display = 'block';
+        
+        // 修改点击过的状态样式，表示已查看
+        const trigger = document.querySelector('.track-status-danger');
+        trigger.innerHTML = '已查看';
+        trigger.style.color = '#999';
+        trigger.style.cursor = 'default';
+        trigger.style.borderBottom = 'none';
+        trigger.onclick = null;
+        trigger.classList.remove('track-status-danger');
+
+        // 滚动到日记框
+        setTimeout(() => {
+            diaryBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+
+        // 显示密码输入区
+        setTimeout(() => {
+            passwordArea.style.display = 'block';
+            document.getElementById('passwordInput').focus();
+        }, 600);
+    }
+
+    // ================= 验证密码（藏头诗解谜） =================
+    // 正确答案：飞猪旅行
+    function checkPassword() {
+        const input = document.getElementById('passwordInput').value.trim();
+        const errorMsg = document.getElementById('passwordError');
+        
+        if (input === '飞猪旅行' || input === '飞猪') {
+            errorMsg.style.display = 'none';
+            showToast('【系统提示】密码正确！正在跳转至旅游网站追踪订单，即将进入第三章...');
+            
+            setTimeout(() => {
+                const viewport = document.getElementById('viewport');
+                viewport.style.opacity = '0';
+                setTimeout(() => {
+                    window.location.href = 'chapter3.html';
+                }, 500);
+            }, 1500);
+        } else {
+            errorMsg.style.display = 'block';
+            showToast('【系统提示】密码错误！提示：提取日记每句的第一个字。');
+        }
+    }
+</script>
+
+</body>
+</html>
