@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老王荒野求生博客 - 好结局</title>
+    <style>
+        /* ================= 全局与浏览器外壳 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
+        #browser { width: 1100px; height: 850px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        
+        /* 浏览器顶栏 */
+        .browser-top { background: #2d2d2d; height: 40px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #444; }
+        .browser-dots { display: flex; gap: 6px; }
+        .browser-dots span { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
+        .browser-dots span:nth-child(2) { background: #ffbd2e; }
+        .browser-dots span:nth-child(3) { background: #27c93f; }
+        .url-bar { flex: 1; background: #1a1a1a; height: 26px; margin-left: 20px; border-radius: 4px; border: 1px solid #444; font-size: 12px; color: #00aaff; display: flex; align-items: center; padding: 0 10px; font-family: monospace; transition: color 0.3s; }
+
+        /* ================= 页面视图容器 ================= */
+        .viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; transition: opacity 0.4s ease; }
+
+        /* ================= 主题 A：橙色博客风 ================= */
+        .theme-blog { background: #fff8e6; flex: 1; display: flex; flex-direction: column; }
+        .theme-blog .header { background: #f0ad4e; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .theme-blog .header-logo { font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .theme-blog .header-nav { display: flex; gap: 25px; font-size: 14px; }
+        .theme-blog .header-nav a { color: #fff; text-decoration: none; cursor: pointer; padding: 5px; transition: 0.3s; }
+        .theme-blog .header-nav a:hover { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .theme-blog .breadcrumbs { background: #fff; padding: 10px 30px; font-size: 12px; color: #666; border-bottom: 1px solid #f0ad4e; }
+        .theme-blog .main-content { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .theme-blog .page-title { color: #d9534f; font-size: 24px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0ad4e; }
+        
+        .comment { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(240,173,78,0.1); margin-bottom: 20px; border-left: 4px solid #f0ad4e; }
+        .comment .author { font-weight: bold; color: #f0ad4e; font-size: 15px; }
+        .comment .date { font-size: 12px; color: #999; margin-left: 10px; }
+        .comment p { margin-top: 10px; font-size: 14px; line-height: 1.8; color: #333; }
+        .clickable-comment { cursor: pointer; border: 2px dashed #f0ad4e; background-color: #fffdf5; transition: all 0.3s; }
+        .clickable-comment:hover { background-color: #fff0d4; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(240,173,78,0.2); }
+
+        .clue-box { display: none; background: #fff; border: 2px solid #f0ad4e; padding: 20px; margin-top: 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(240,173,78,0.15); animation: fadeIn 0.5s; }
+        .clue-box h3 { color: #d9534f; font-size: 16px; margin-bottom: 15px; border-bottom: 1px dashed #f0ad4e; padding-bottom: 10px; }
+        .clue-box p { font-size: 14px; line-height: 1.8; color: #333; margin-bottom: 10px; }
+
+        /* 摩斯密码播放器 */
+        .audio-player { background: #f0ad4e; color: #fff; padding: 15px 20px; border-radius: 8px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
+        .audio-player:hover { background: #ec971f; transform: scale(1.01); }
+        .audio-player .play-icon { font-size: 24px; margin-right: 15px; }
+        .audio-player .text { font-weight: bold; font-size: 15px; }
+        .morse-table { display: none; margin-top: 15px; background: #fff; border: 1px dashed #f0ad4e; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 13px; line-height: 1.8; }
+
+        /* 密码输入区 */
+        .password-area { display: none; margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #f0ad4e; border-radius: 6px; }
+        .password-area input { padding: 10px; font-size: 16px; width: 250px; border: 1px solid #f0ad4e; border-radius: 4px; font-family: monospace; text-transform: uppercase; }
+        .password-area button { padding: 10px 20px; background: #f0ad4e; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; margin-left: 10px; font-weight: bold; }
+        .password-area button:hover { background: #ec971f; }
+
+        /* ================= 主题 B：灰色新闻风 ================= */
+        .theme-news { background: #f4f4f4; flex: 1; display: flex; flex-direction: column; display: none; }
+        .theme-news .header { background: #333; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .theme-news .header-logo { font-size: 22px; font-weight: bold; }
+        .theme-news .breadcrumbs { background: #fff; padding: 10px 30px; font-size: 12px; color: #666; border-bottom: 1px solid #333; }
+        .theme-news .main-content { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .theme-news .page-title { color: #333; font-size: 24px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+        .news-article { background: #fff; padding: 30px; border: 1px solid #ddd; line-height: 1.8; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .news-article p { margin-bottom: 15px; font-size: 15px; color: #333; }
+
+        /* ================= 主题 C：好结局风 ================= */
+        .theme-ending { background: #e8f5e9; flex: 1; display: flex; flex-direction: column; display: none; }
+        .theme-ending .header { background: #27c93f; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .theme-ending .header-logo { font-size: 22px; font-weight: bold; }
+        .theme-ending .main-content { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; text-align: center; }
+        .theme-ending h2 { color: #27c93f; margin-bottom: 20px; font-size: 26px; }
+        .theme-ending p { font-size: 16px; line-height: 1.8; color: #333; margin-bottom: 20px; text-align: left; }
+
+        /* 按钮 */
+        .btn { display: inline-block; padding: 12px 25px; border: none; cursor: pointer; font-size: 15px; font-weight: bold; text-decoration: none; transition: background 0.3s; margin-top: 15px; border-radius: 4px; color: #fff; }
+        .btn-blog { background: #f0ad4e; }
+        .btn-blog:hover { background: #ec971f; }
+        .btn-news { background: #333; }
+        .btn-news:hover { background: #111; }
+        .btn-ending { background: #27c93f; }
+        .btn-ending:hover { background: #1e9e2f; }
+
+        /* 全局提示框 */
+        .toast { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 12px 25px; border-radius: 6px; font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: transform 0.4s ease, opacity 0.4s; z-index: 200; border-left: 4px solid #f0ad4e; max-width: 600px; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div id="browser">
+    <div class="browser-top">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="url-bar" id="urlBar">https://blog.sina.com.cn/daoyou_laowang</div>
+    </div>
+    
+    <div class="viewport" id="viewport">
+        
+        <!-- ================= 视图1：博客（第四章） ================= -->
+        <div class="theme-blog" id="view-blog">
+            <div class="header">
+                <div class="header-logo">⛺ 老王荒野求生博客</div>
+                <div class="header-nav">
+                    <a onclick="clickNav('首页')">首页</a>
+                    <a onclick="clickNav('博文')" style="color:#ffd700;">博文</a>
+                    <a onclick="clickNav('相册')">相册</a>
+                </div>
+            </div>
+            <div class="breadcrumbs">Home > 博文 > 2026年7月荒岛体验营日记</div>
+            <div class="main-content">
+                <div class="page-title">2026年7月荒岛体验营日记</div>
+                <p style="font-size:14px; color:#666; margin-bottom:20px;">记录我在荒岛上带过的那些“城市少爷”们。</p>
+                
+                <div class="comment" onclick="clickComment('椰子')">
+                    <span class="author">老王</span><span class="date">2026-07-15 18:00</span>
+                    <p>今天来了个戴眼镜的高中生，叫林知易。让他搭帐篷，他问我有没有说明书；让他生火，他试图用椰子壳钻木取火，结果把椰子砸在了自己头上。😂</p>
+                </div>
+                
+                <div class="comment" onclick="clickComment('海鸥')">
+                    <span class="author">老王</span><span class="date">2026-07-16 12:00</span>
+                    <p>林知易早上试图跟海鸥分享他的面包，结果海鸥把他整个面包抢走了。他追着海鸥跑了半个沙滩，最后摔了一跤，眼镜都飞了。笑死我了。</p>
+                </div>
+
+                <div class="comment clickable-comment" id="clickableComment" onclick="showClue()">
+                    <span class="author">匿名网友（陆明瑶）</span><span class="date">2026-07-17 09:00</span>
+                    <p style="color:#d9534f; font-weight:bold;">请问这个叫林知易的现在在哪？我是他同学，他家长快急疯了！（点击查看回复）</p>
+                </div>
+
+                <div class="clue-box" id="clueBox">
+                    <h3>老王的回复</h3>
+                    <p id="replyText">“哎呀！昨天他吃没烤熟的<strong>螃蟹</strong>，拉肚子拉虚脱了，我们联系了当地救援队，现在人在镇上医院呢！不过人没事，就是有点丢人。”</p>
+                    <p style="color:#666; font-size:13px;">陆明瑶的独白：“……所以，他失踪这几天，其实是在荒岛上跟椰子、海鸥和螃蟹搏斗？这个笨蛋……”</p>
+                    
+                    <p style="margin-top:20px; font-weight:bold; color:#d9534f;">🔍 线索提示：老王在昨晚的录音里记录了一段奇怪的声音，似乎是林知易留下的求救信号。</p>
+                    <div class="audio-player" onclick="playMorseCode()">
+                        <div style="display:flex; align-items:center;">
+                            <span class="play-icon">▶</span>
+                            <span class="text">播放荒岛现场录音（爆音解谜）</span>
+                        </div>
+                        <span style="font-size:12px;">点击播放</span>
+                    </div>
+                    
+                    <div class="morse-table" id="morseTable">
+                        <strong>摩斯密码对照表：</strong><br>
+                        A .- &nbsp;&nbsp; B -... &nbsp;&nbsp; C -.-. &nbsp;&nbsp; D -.. &nbsp;&nbsp; E .<br>
+                        F ..-. &nbsp;&nbsp; G --. &nbsp;&nbsp; H .... &nbsp;&nbsp; I .. &nbsp;&nbsp; J .---<br>
+                        K -.- &nbsp;&nbsp; L .-.. &nbsp;&nbsp; M -- &nbsp;&nbsp; N -. &nbsp;&nbsp; O ---<br>
+                        P .--. &nbsp;&nbsp; Q --.- &nbsp;&nbsp; R .-. &nbsp;&nbsp; S ... &nbsp;&nbsp; T -<br>
+                        U ..- &nbsp;&nbsp; V ...- &nbsp;&nbsp; W .-- &nbsp;&nbsp; X -..- &nbsp;&nbsp; Y -.-- &nbsp;&nbsp; Z --..<br>
+                        <em style="color:#666;">（提示：音频中每段敲击代表一个字母，短音为“.”，长音为“-”。）</em>
+                    </div>
+
+                    <div class="password-area" id="passwordArea">
+                        <h3 style="color:#f0ad4e; margin-bottom:10px;">🔐 输入摩斯密码解码结果</h3>
+                        <p style="font-size:13px; color:#666; margin-bottom:15px;">根据录音中长短音的组合，输入解码后的英文单词（4个字母，不区分大小写）。</p>
+                        <input type="text" id="passwordInput" placeholder="输入英文单词" onkeydown="if(event.key === 'Enter') checkPassword()">
+                        <button onclick="checkPassword()">解码</button>
+                        <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">解码错误，请仔细听录音并对照摩斯密码表。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 视图2：新闻（第五章） ================= -->
+        <div class="theme-news" id="view-news">
+            <div class="header">
+                <div class="header-logo">📰 本地新闻 | 社会广角</div>
+                <div style="font-size:14px;">首页 | 本地 | 社会</div>
+            </div>
+            <div class="breadcrumbs">Home > 社会 > 救援队公告</div>
+            <div class="main-content">
+                <div class="page-title">关于成功救援荒岛受困游客的通报</div>
+                <p style="font-size:14px; color:#666; margin-bottom:20px;">发布时间：2026-07-18 10:00</p>
+                
+                <div class="news-article">
+                    <p>昨日晚，我队接到报警称，有一名参与“荒岛求生”体验营的游客在岛上失联。接警后，我队迅速出动无人机与救援船只。</p>
+                    <p>经过连夜搜寻，于今日凌晨在岛屿东侧沙滩发现该游客。该游客因食用未煮熟的<strong>螃蟹</strong>导致严重腹泻脱水，且因迷路产生轻微幻觉。</p>
+                    <p>目前该游客生命体征平稳，已被家长接回。在此提醒广大市民，亲近自然需量力而行。</p>
+                </div>
+                
+                <div style="text-align:center; margin-top:30px;">
+                    <button class="btn btn-news" onclick="showEndingA()">结局A：荒岛乌龙（点击触发）</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 视图3：好结局 ================= -->
+        <div class="theme-ending" id="view-ending">
+            <div class="header">
+                <div class="header-logo">🎉 结局A：荒岛乌龙</div>
+            </div>
+            <div class="main-content">
+                <h2>🎉 恭喜达成结局A：荒岛乌龙！</h2>
+                <p>
+                    林知易被家长从医院接回了家。虽然他在全校面前因为“吃坏肚子而在沙滩上打滚”出了名，但他终于露出了久违的、没心没肺的笑容。
+                </p>
+                <p>
+                    陆明瑶把他的荒岛日记发到了班级群里，大家笑了整整一周。学校的竞赛班也因此暂时停课了一周，组织了一次真正的春游。
+                </p>
+                <p style="font-weight:bold; text-align:center; color:#333; margin-top:30px;">
+                    但是，这真的是全部的真相吗？
+                </p>
+                <div style="text-align:center; margin-top:20px; border-top:1px dashed #ccc; padding-top:20px;">
+                    <button class="btn btn-ending" onclick="goToHiddenRoute()">等等，我好像在订单里漏掉了什么……</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 全局提示 -->
+    <div class="toast" id="toast"></div>
+</div>
+
+<script>
+    // ================= 通用提示框 =================
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        if (window.toastTimer) clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    // ================= 顶部导航点击 =================
+    function clickNav(name) {
+        if (name === '博文') { showToast('【系统提示】您当前已在博文页面。'); }
+        else if (name === '首页') { showToast('【系统提示】正在返回首页。这里还有很多老王带过的其他“少爷”们的故事。'); }
+        else if (name === '相册') { showToast('【系统提示】相册里全是林知易在沙滩上摔跤的抓拍，老王表示很满意。'); }
+    }
+
+    // ================= 博客评论点击 =================
+    function clickComment(topic) {
+        if (topic === '椰子') { showToast('陆明瑶：“用椰子壳钻木取火……他真是个学术派。不过，这确实很像他能干出来的事。”'); }
+        else if (topic === '海鸥') { showToast('陆明瑶：“被海鸥抢面包，还追着跑……他平时在教室里连大声说话都不敢，居然追海鸥？”'); }
+    }
+
+    // ================= 显示老王回复与录音 =================
+    function showClue() {
+        const clueBox = document.getElementById('clueBox');
+        clueBox.style.display = 'block';
+        
+        const trigger = document.getElementById('clickableComment');
+        trigger.style.border = '1px solid #ddd'; trigger.style.backgroundColor = '#f9f9f9'; trigger.style.cursor = 'default'; trigger.onclick = null; trigger.classList.remove('clickable-comment');
+
+        setTimeout(() => { clueBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    }
+
+    // ================= 摩斯密码爆音解谜 =================
+    let audioCtx = null;
+    function playMorseCode() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        // 摩斯密码消息：C (-.-.) R (.-.) A (.-) B (-...)
+        const morseCode = [
+            { code: '-.-.', letter: 'C' },
+            { code: '.-.', letter: 'R' },
+            { code: '.-', letter: 'A' },
+            { code: '-...', letter: 'B' }
+        ];
+        
+        const dotDuration = 0.12; // 短音时长
+        const dashDuration = 0.36; // 长音时长
+        const gapDuration = 0.12; // 字母内部间隔
+        const letterGap = 0.36; // 字母间间隔
+
+        let startTime = audioCtx.currentTime + 0.1;
+
+        morseCode.forEach((item, index) => {
+            let currentTime = startTime;
+            
+            // 播放当前字母的每一个点划
+            for (let i = 0; i < item.code.length; i++) {
+                const symbol = item.code[i];
+                const duration = symbol === '.' ? dotDuration : dashDuration;
+                
+                // 创建振荡器
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 800; // 800Hz 音调
+                
+                gainNode.gain.setValueAtTime(0, currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.5, currentTime + 0.02); // 快速淡入
+                gainNode.gain.setValueAtTime(0.5, currentTime + duration - 0.02);
+                gainNode.gain.linearRampToValueAtTime(0, currentTime + duration); // 快速淡出
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.start(currentTime);
+                oscillator.stop(currentTime + duration);
+                
+                currentTime += duration + gapDuration;
+            }
+            
+            // 字母之间的间隔
+            startTime = currentTime + letterGap;
+        });
+
+        // 显示摩斯密码表
+        document.getElementById('morseTable').style.display = 'block';
+        document.getElementById('passwordArea').style.display = 'block';
+        document.getElementById('passwordInput').focus();
+        
+        showToast('【系统提示】录音播放完毕。请对照摩斯密码表解码。');
+    }
+
+    // ================= 验证密码（解码结果） =================
+    // 正确答案：CRAB
+    function checkPassword() {
+        const input = document.getElementById('passwordInput').value.trim().toUpperCase();
+        const errorMsg = document.getElementById('passwordError');
+        
+        if (input === 'CRAB') {
+            errorMsg.style.display = 'none';
+            showToast('【系统提示】解码正确！螃蟹(CRAB)。正在跳转至救援新闻...');
+            
+            setTimeout(() => {
+                document.getElementById('urlBar').innerText = 'https://www.local-news.com/rescue';
+                switchView('view-blog', 'view-news');
+            }, 1500);
+        } else {
+            errorMsg.style.display = 'block';
+            showToast('【系统提示】解码错误！请听录音中的长短音，并对照摩斯密码表。');
+        }
+    }
+
+    // ================= 统一视图切换函数 =================
+    function switchView(fromId, toId) {
+        const fromView = document.getElementById(fromId);
+        const toView = document.getElementById(toId);
+        const viewport = document.getElementById('viewport');
+        
+        viewport.style.opacity = '0';
+        setTimeout(() => {
+            fromView.style.display = 'none';
+            toView.style.display = 'flex';
+            viewport.scrollTop = 0;
+            setTimeout(() => { viewport.style.opacity = '1'; }, 50);
+        }, 400);
+    }
+
+    // ================= 触发结局A =================
+    function showEndingA() {
+        document.getElementById('urlBar').innerText = 'https://www.yacac.org.cn/endA';
+        switchView('view-news', 'view-ending');
+    }
+
+    // ================= 触发隐藏IF线 =================
+    function goToHiddenRoute() {
+        const viewport = document.getElementById('viewport');
+        viewport.style.opacity = '0';
+        setTimeout(() => {
+            window.location.href = 'if_ending.html'; 
+        }, 400);
+    }
+</script>
+
+</body>
+</html>
