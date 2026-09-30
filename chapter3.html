@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单详情 | 飞猪旅行</title>
+    <style>
+        /* ================= 全局与浏览器外壳 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
+        #browser { width: 1100px; height: 850px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        
+        /* 浏览器顶栏 */
+        .browser-top { background: #2d2d2d; height: 40px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #444; }
+        .browser-dots { display: flex; gap: 6px; }
+        .browser-dots span { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
+        .browser-dots span:nth-child(2) { background: #ffbd2e; }
+        .browser-dots span:nth-child(3) { background: #27c93f; }
+        .url-bar { flex: 1; background: #1a1a1a; height: 26px; margin-left: 20px; border-radius: 4px; border: 1px solid #444; font-size: 12px; color: #00aaff; display: flex; align-items: center; padding: 0 10px; font-family: monospace; }
+        
+        /* ================= 蓝色旅游风 ================= */
+        .viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #e6f2ff; position: relative; transition: opacity 0.5s ease; }
+        .header { background: #0088cc; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .header-nav { display: flex; gap: 25px; font-size: 14px; }
+        .header-nav a { color: #fff; text-decoration: none; cursor: pointer; padding: 5px; transition: 0.3s; }
+        .header-nav a:hover { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        .breadcrumbs { background: #fff; padding: 10px 30px; font-size: 12px; color: #666; border-bottom: 1px solid #bce8f1; }
+        .main-content { padding: 40px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .page-title { color: #0088cc; font-size: 24px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #0088cc; }
+        
+        /* 订单卡片 */
+        .order-card { background: #fff; border: 1px solid #bce8f1; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,136,204,0.1); }
+        .order-row { display: flex; margin-bottom: 15px; font-size: 15px; border-bottom: 1px dashed #e6f2ff; padding-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .order-row:hover { background-color: #f5fbff; padding-left: 5px; }
+        .order-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .order-label { width: 120px; color: #666; font-weight: bold; }
+        .order-value { flex: 1; color: #333; }
+        
+        /* 展开的客服记录 */
+        .chat-box { display: none; background: #fff; border: 2px solid #0088cc; border-radius: 6px; padding: 20px; margin-top: 20px; box-shadow: 0 5px 15px rgba(0,136,204,0.15); animation: fadeIn 0.5s; }
+        .chat-box h3 { color: #0088cc; font-size: 16px; margin-bottom: 15px; border-bottom: 1px dashed #bce8f1; padding-bottom: 10px; }
+        .chat-msg { margin-bottom: 15px; font-size: 14px; line-height: 1.6; }
+        .chat-msg .bot { color: #0088cc; font-weight: bold; }
+        .chat-msg .user { color: #333; font-weight: bold; }
+        .chat-msg .text { color: #555; background: #f9f9f9; padding: 10px; border-radius: 6px; margin-top: 5px; display: inline-block; max-width: 90%; }
+        .chat-msg .text.user-text { background: #e6f7ff; }
+
+        /* 密码输入区 (文本提取解谜) */
+        .password-area { display: none; margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #bce8f1; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,136,204,0.05); }
+        .password-area input { padding: 10px; font-size: 16px; width: 250px; border: 1px solid #bce8f1; border-radius: 4px; font-family: monospace; }
+        .password-area button { padding: 10px 20px; background: #0088cc; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; margin-left: 10px; font-weight: bold; }
+        .password-area button:hover { background: #006699; }
+
+        /* 跳转按钮 */
+        .next-btn { display: none; margin-top: 25px; text-align: center; }
+        .next-btn button { padding: 15px 40px; background: #f0ad4e; color: #fff; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.3s; }
+        .next-btn button:hover { background: #ec971f; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(240,173,78,0.3); }
+
+        /* 全局提示框 */
+        .toast { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 12px 25px; border-radius: 6px; font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: transform 0.4s ease, opacity 0.4s; z-index: 200; border-left: 4px solid #0088cc; max-width: 600px; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div id="browser">
+    <div class="browser-top">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="url-bar">https://www.mafengwo-travel.com/orders</div>
+    </div>
+    
+    <div class="viewport" id="viewport">
+        <!-- 旅游网站头部 -->
+        <div class="header">
+            <div class="header-logo">🐷 飞猪旅行 · 逃离城市</div>
+            <div class="header-nav">
+                <a onclick="clickNav('首页')">首页</a>
+                <a onclick="clickNav('我的订单')" style="color:#ffd700;">我的订单</a>
+                <a onclick="clickNav('客服中心')">客服中心</a>
+            </div>
+        </div>
+        
+        <div class="breadcrumbs">Home > 我的订单 > 订单详情</div>
+
+        <div class="main-content">
+            <div class="page-title">订单详情 | Order Details</div>
+            
+            <div class="order-card">
+                <div class="order-row" onclick="clickOrder('订单号')">
+                    <div class="order-label">订单号：</div>
+                    <div class="order-value" style="font-family: monospace;">LY20260714</div>
+                </div>
+                <div class="order-row" onclick="clickOrder('预订人')">
+                    <div class="order-label">预订人：</div>
+                    <div class="order-value">林知易</div>
+                </div>
+                <div class="order-row" onclick="showChat()">
+                    <div class="order-label">产品名称：</div>
+                    <div class="order-value">
+                        <span style="color: #0088cc; font-weight: bold; text-decoration: underline;">【极限挑战】荒岛求生7日体验营（含专业向导）</span>
+                        <span style="font-size:12px; color:#0088cc; margin-left:10px;">[点击查看客服记录]</span>
+                    </div>
+                </div>
+                <div class="order-row" onclick="clickOrder('出行日期')">
+                    <div class="order-label">出行日期：</div>
+                    <div class="order-value">2026-07-14 至 2026-07-21</div>
+                </div>
+                <div class="order-row" onclick="clickOrder('订单状态')">
+                    <div class="order-label">订单状态：</div>
+                    <div class="order-value" style="color: #27c93f; font-weight: bold;">已支付</div>
+                </div>
+            </div>
+
+            <!-- 客服聊天记录（文本提取解谜的核心载体） -->
+            <div class="chat-box" id="chatBox">
+                <h3>💬 在线客服聊天记录</h3>
+                
+                <div class="chat-msg">
+                    <span class="bot">客服小飞：</span>
+                    <div class="text">您好，林先生！您的“荒岛求生7日体验营”订单已确认。请问您对行程有什么特殊要求吗？</div>
+                </div>
+                
+                <div class="chat-msg">
+                    <span class="user">林知易：</span>
+                    <div class="text user-text">我社恐，喜欢安静。请给我安排没人的地方。我带了《瓦尔登湖》和《荒岛生存指南》。如果岛上没有信号，我就看书。</div>
+                </div>
+                
+                <div class="chat-msg">
+                    <span class="bot">客服小飞：</span>
+                    <div class="text">好的。另外，我们最近的“VIP极速冲浪班”有优惠，可以帮您提升抗压能力，需要了解一下吗？</div>
+                </div>
+                
+                <div class="chat-msg">
+                    <span class="user">林知易：</span>
+                    <div class="text user-text">不用了。我只需要一个没有排名和试卷的地方。</div>
+                </div>
+
+                <div class="chat-msg">
+                    <span class="bot">客服小飞：</span>
+                    <div class="text">好的，您的向导老王将在鼓浪屿码头接您。祝您旅途愉快！</div>
+                </div>
+            </div>
+
+            <!-- 密码提取区 -->
+            <div class="password-area" id="passwordArea">
+                <h3 style="color:#0088cc; margin-bottom:10px;">🔐 提取向导信息</h3>
+                <p style="font-size:13px; color:#666; margin-bottom:15px;">请从客服聊天记录中提取负责接待林知易的向导名字，输入以解锁向导博客。</p>
+                <input type="text" id="passwordInput" placeholder="请输入向导名字" onkeydown="if(event.key === 'Enter') checkPassword()">
+                <button onclick="checkPassword()">解锁</button>
+                <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">名字错误，请仔细阅读客服聊天记录。</p>
+            </div>
+
+            <!-- 跳转下一步 -->
+            <div class="next-btn" id="nextBtn">
+                <button onclick="goToChapter4()">前往向导老王的博客查看荒岛日记 →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局提示 -->
+    <div class="toast" id="toast"></div>
+</div>
+
+<script>
+    // ================= 通用提示框 =================
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        if (window.toastTimer) clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
+    }
+
+    // ================= 顶部导航点击 =================
+    function clickNav(name) {
+        if (name === '我的订单') {
+            showToast('【系统提示】您当前已在订单详情页。');
+        } else if (name === '首页') {
+            showToast('【系统提示】正在返回首页。但这里除了各种旅游套餐，什么线索都没有。');
+        } else if (name === '客服中心') {
+            showToast('【系统提示】客服忙线中。请从订单详情页查看与客服的历史聊天记录。');
+        }
+    }
+
+    // ================= 订单字段点击 =================
+    function clickOrder(field) {
+        if (field === '订单号') {
+            showToast('【系统提示】订单号：LY20260714。下单时间：2026-07-11 02:35 AM。');
+        } else if (field === '预订人') {
+            showToast('陆明瑶：“预订人写的是林知易。他平时连买瓶水都要犹豫半天，居然花大几千买荒岛求生。”');
+        } else if (field === '出行日期') {
+            showToast('陆明瑶：“7月14日出发……也就是他失踪后的第三天。他早就计划好要逃跑了。”');
+        } else if (field === '订单状态') {
+            showToast('【系统提示】订单已支付，不可退款。');
+        }
+    }
+
+    // ================= 点击产品名称，展开客服记录 =================
+    function showChat() {
+        const chatBox = document.getElementById('chatBox');
+        const passwordArea = document.getElementById('passwordArea');
+        
+        chatBox.style.display = 'block';
+        passwordArea.style.display = 'block';
+        
+        setTimeout(() => {
+            chatBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+        
+        setTimeout(() => {
+            document.getElementById('passwordInput').focus();
+        }, 600);
+    }
+
+    // ================= 验证向导名字（文本提取解谜） =================
+    // 正确答案：老王
+    function checkPassword() {
+        const input = document.getElementById('passwordInput').value.trim();
+        const errorMsg = document.getElementById('passwordError');
+        
+        if (input === '老王' || input === '向导老王' || input === '王导') {
+            errorMsg.style.display = 'none';
+            showToast('【系统提示】信息提取成功！正在解锁向导老王的博客...');
+            
+            document.getElementById('passwordArea').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('nextBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
+        } else {
+            errorMsg.style.display = 'block';
+            showToast('【系统提示】提取失败！提示：客服最后一条消息中提到了谁去码头接他？');
+        }
+    }
+
+    // ================= 跳转第四章 =================
+    function goToChapter4() {
+        const viewport = document.getElementById('viewport');
+        viewport.style.opacity = '0';
+        setTimeout(() => {
+            window.location.href = 'chapter4.html';
+        }, 500);
+    }
+</script>
+
+</body>
+</html>
