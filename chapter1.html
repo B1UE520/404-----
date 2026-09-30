@@ -3,39 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404：知易行难</title>
+    <title>成绩查询 | 全国青少年学术竞赛评估中心</title>
     <style>
+        /* ================= 全局与浏览器外壳 ================= */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
-        #browser { width: 1100px; height: 850px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+        #browser { width: 1100px; height: 850px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        
+        /* 浏览器顶栏 */
         .browser-top { background: #2d2d2d; height: 40px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #444; }
         .browser-dots { display: flex; gap: 6px; }
         .browser-dots span { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
         .browser-dots span:nth-child(2) { background: #ffbd2e; }
         .browser-dots span:nth-child(3) { background: #27c93f; }
-        .url-bar { flex: 1; background: #1a1a1a; height: 26px; margin-left: 20px; border-radius: 4px; border: 1px solid #444; font-size: 12px; color: #888; display: flex; align-items: center; padding: 0 10px; font-family: monospace; }
-        .refresh-btn { color: #888; font-size: 16px; margin-left: 10px; cursor: pointer; transition: 0.3s; }
-        .refresh-btn:hover { color: #fff; transform: rotate(90deg); }
+        .url-bar { flex: 1; background: #1a1a1a; height: 26px; margin-left: 20px; border-radius: 4px; border: 1px solid #444; font-size: 12px; color: #00aaff; display: flex; align-items: center; padding: 0 10px; font-family: monospace; }
         
-        .viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: linear-gradient(180deg, #1a1a1a 0%, #2c2c2c 100%); color: #e0e0e0; padding: 60px 80px; }
-        .game-title { font-size: 32px; color: #fff; margin-bottom: 10px; letter-spacing: 2px; font-weight: bold; }
-        .game-subtitle { font-size: 14px; color: #cc0000; margin-bottom: 40px; font-weight: bold; }
-        .story { font-size: 16px; line-height: 2; color: #b0b0b0; max-width: 750px; margin-bottom: 40px; }
-        .story p { margin-bottom: 15px; }
-        .kw { color: #fff; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #666; transition: 0.3s; padding: 0 2px; }
-        .kw:hover { color: #00aaff; border-bottom-color: #00aaff; background: rgba(0,170,255,0.1); }
-        .kw-danger { color: #cc0000; font-weight: bold; cursor: pointer; border-bottom: 1px dashed #cc0000; }
-        .kw-danger:hover { background: rgba(204,0,0,0.2); }
+        /* ================= 红白官方风 ================= */
+        .viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #fff; position: relative; }
+        .header { background: #cc0000; color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { font-size: 22px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .header-logo .circle { background: #fff; color: #cc0000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .header-nav { display: flex; gap: 25px; font-size: 14px; }
+        .header-nav a { color: #fff; text-decoration: none; cursor: pointer; padding: 5px; transition: 0.3s; }
+        .header-nav a:hover { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        .notice { background: #fff3cd; color: #856404; text-align: center; padding: 8px; font-size: 13px; border-bottom: 1px solid #ffeeba; }
+        .notice strong { color: #cc0000; }
+        .breadcrumbs { background: #f9f9f9; padding: 10px 30px; font-size: 12px; color: #666; border-bottom: 1px solid #ddd; }
+        .layout { display: flex; flex: 1; }
+        .main-content { flex: 3; padding: 30px; border-right: 1px solid #eee; }
+        .sidebar { flex: 1; background: #fafafa; padding: 20px; }
+        .sidebar-title { background: #cc0000; color: #fff; padding: 10px; font-size: 14px; font-weight: bold; margin-bottom: 15px; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; color: #333; cursor: pointer; transition: 0.2s; }
+        .sidebar li:hover { color: #cc0000; background: #fff0f0; padding-left: 5px; }
+        .sidebar li::before { content: '►'; color: #cc0000; font-size: 10px; margin-right: 8px; }
         
-        .history-box { background: #2a2a2a; border: 1px solid #444; border-radius: 6px; padding: 20px; max-width: 750px; }
-        .history-box p { font-size: 14px; color: #888; margin-bottom: 10px; }
-        .history-link { display: inline-block; color: #00aaff; text-decoration: none; font-size: 16px; font-family: monospace; padding: 8px 12px; background: #1a1a1a; border-radius: 4px; border: 1px solid #333; cursor: pointer; transition: 0.3s; }
-        .history-link:hover { background: #333; border-color: #00aaff; box-shadow: 0 0 10px rgba(0,170,255,0.2); text-decoration: underline; }
-        .hint { font-size: 12px; color: #555; margin-top: 10px; font-style: italic; }
+        .ad-box { margin-top: 30px; background: #fff; border: 1px solid #ddd; text-align: center; padding: 15px 10px; cursor: pointer; transition: 0.3s; }
+        .ad-box:hover { border-color: #cc0000; box-shadow: 0 0 10px rgba(204,0,0,0.1); }
+        .ad-box .ad-text { color: #e67e22; font-weight: bold; font-size: 16px; }
+        .ad-box .ad-sub { color: #666; font-size: 12px; margin-top: 5px; }
+
+        .page-title { color: #cc0000; font-size: 24px; font-weight: bold; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #cc0000; }
         
-        /* 弹出提示框 */
-        .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 15px 30px; border-radius: 6px; font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: transform 0.4s ease; z-index: 100; border-left: 4px solid #00aaff; max-width: 600px; }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
+        th { background-color: #f2f2f2; font-weight: normal; color: #333; cursor: default; }
+        td:hover { background-color: #f9f9f9; }
+        .clickable-cell { color: #cc0000; font-weight: bold; background-color: #fff0f0; }
+        .clickable-cell:hover { background-color: #ffcccc; }
+        
+        /* 线索框 */
+        .clue-box { display: none; background: #fff; border: 2px solid #cc0000; padding: 20px; margin-top: 20px; box-shadow: 0 5px 15px rgba(204,0,0,0.1); animation: fadeIn 0.5s; }
+        .clue-box h3 { color: #cc0000; font-size: 16px; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; }
+        .clue-box p { font-size: 14px; line-height: 1.8; color: #333; margin-bottom: 10px; }
+        
+        /* 密码输入区 */
+        .password-area { display: none; margin-top: 20px; padding: 20px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 4px; }
+        .password-area input { padding: 10px; font-size: 16px; width: 200px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; text-transform: uppercase; }
+        .password-area button { padding: 10px 20px; background: #cc0000; color: #fff; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; margin-left: 10px; font-weight: bold; }
+        .password-area button:hover { background: #aa0000; }
+
+        /* 源代码弹窗 */
+        .modal-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: #1e1e1e; width: 80%; height: 70%; border-radius: 6px; padding: 20px; color: #d4d4d4; font-family: 'Courier New', monospace; font-size: 14px; overflow-y: auto; box-shadow: 0 0 30px rgba(0,0,0,0.8); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; color: #569cd6; }
+        .close-btn { cursor: pointer; color: #ff5f56; font-weight: bold; }
+        .code-line { line-height: 1.6; white-space: pre-wrap; }
+        .code-comment { color: #6a9955; }
+        .code-tag { color: #569cd6; }
+        .code-string { color: #ce9178; }
+
+        /* 全局提示框 */
+        .toast { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 12px 25px; border-radius: 6px; font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: transform 0.4s ease, opacity 0.4s; z-index: 200; border-left: 4px solid #cc0000; max-width: 600px; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -43,92 +87,245 @@
 <div id="browser">
     <div class="browser-top">
         <div class="browser-dots"><span></span><span></span><span></span></div>
-        <div class="url-bar" id="urlBar">about:blank</div>
-        <div class="refresh-btn" onclick="refreshPage()">⟳</div>
+        <div class="url-bar">https://www.yacac.org.cn/results</div>
     </div>
     
-    <div class="viewport">
-        <h1 class="game-title">《404：知易行难》</h1>
-        <div class="game-subtitle">—— 寻找林知易 ——</div>
-        
-        <div class="story" id="storyBox">
-            <p>2026年7月，盛夏。空气里弥漫着燥热，但教室里却冷得像个冰窖。</p>
-            <p>我的同桌，<span class="kw" onclick="clickKeyword('林知易')">林知易</span>，已经失踪三天了。</p>
-            <p>他是全校公认的“竞赛机器”，课桌上永远堆着做不完的卷子，黑眼圈重得像被人打了一拳。就在失踪前，他刚刚在<span class="kw-danger" onclick="clickKeyword('数学国初赛')">数学国初赛</span>上弃考了。</p>
-            <p>警察来调查过，但毫无头绪。家长和老师焦急万分，却依然在谈论他落下的<span class="kw" onclick="clickKeyword('模拟考成绩')">模拟考成绩</span>。</p>
-            <p>我叫<span class="kw" onclick="clickKeyword('陆明瑶')">陆明瑶</span>。我是唯一知道他电脑密码的人。</p>
-            <p>趁着他的父母去学校交涉，我打开了他的电脑。屏幕亮起，桌面干净得有些异常。但在浏览器的历史记录里，我发现了一个被反复访问的网站。</p>
-            <p>那是他所有压力的来源，也是寻找他的第一站。</p>
+    <div class="viewport" id="viewport">
+        <!-- 官网头部 -->
+        <div class="header">
+            <div class="header-logo"><div class="circle">Y</div> 全国青少年学术竞赛评估中心</div>
+            <div class="header-nav">
+                <a onclick="clickNav('首页')">首页</a>
+                <a onclick="clickNav('关于YACAC')">关于YACAC</a>
+                <a style="color:#ffd700;" onclick="clickNav('成绩查询')">成绩查询</a>
+                <a onclick="clickNav('联系我们')">联系我们</a>
+            </div>
         </div>
+        
+        <div class="notice">
+            <strong>[系统公告]</strong> 距离2026年秋季全国总决赛仅剩 45 天，请各位考生抓紧时间复习，冲击名校保送名额！
+        </div>
+        <div class="breadcrumbs">Home > 关于YACAC > 成绩查询 | Exam Results</div>
 
-        <div class="history-box">
-            <p>🔗 浏览器历史记录 (2026-07-11 02:30 AM)：</p>
-            <a class="history-link" onclick="goToCompetitionSite()">https://www.yacac.org.cn/results</a>
-            <p class="hint">（点击链接进入竞赛官网）</p>
+        <div class="layout">
+            <!-- 左侧主内容 -->
+            <div class="main-content">
+                <div class="page-title">成绩查询 | Exam Results</div>
+                <p style="font-size:14px; color:#666; margin-bottom:20px;">「全国青少年学术竞赛」的历史成绩结果。请点击下方对应月份查看详细记录。</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:15%;">2026年</th>
+                            <th>1月 Jan</th><th>2月 Feb</th><th>3月 Mar</th><th>4月 Apr</th><th>5月 May</th><th>6月 Jun</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="cursor:default;"><strong>数学联赛</strong></td>
+                            <td onclick="clickCell('数学联赛','1月','省二')">省二</td>
+                            <td onclick="clickCell('数学联赛','2月','省一')">省一</td>
+                            <td onclick="clickCell('数学联赛','3月','国三')">国三</td>
+                            <td onclick="clickCell('数学联赛','4月','国二')">国二</td>
+                            <td onclick="clickCell('数学联赛','5月','国一')">国一</td>
+                            <td class="clickable-cell" onclick="clickAbsent()">查看结果</td>
+                        </tr>
+                        <tr>
+                            <td style="cursor:default;"><strong>物理杯</strong></td>
+                            <td onclick="clickCell('物理杯','1月','省三')">省三</td>
+                            <td onclick="clickCell('物理杯','2月','省二')">省二</td>
+                            <td onclick="clickCell('物理杯','3月','省一')">省一</td>
+                            <td onclick="clickCell('物理杯','4月','国三')">国三</td>
+                            <td onclick="clickCell('物理杯','5月','国二')">国二</td>
+                            <td onclick="clickCell('物理杯','6月','无记录')">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 弃考线索框 -->
+                <div class="clue-box" id="clueBox">
+                    <h3>⚠️ 系统异常记录警报</h3>
+                    <p><strong>考生姓名：</strong>林知易</p>
+                    <p><strong>考试科目：</strong>2026年6月 数学联赛（国初赛）</p>
+                    <p><strong>最终状态：</strong><span style="color:#cc0000; font-weight:bold; font-size:16px;">弃考 (Absent)</span></p>
+                    <p style="color:#666; font-size:13px; background:#f9f9f9; padding:10px; border-left:3px solid #cc0000;">
+                        系统备注：该考生此前从未缺席任何一场赛事，且长期占据年级红榜前三。此次弃考行为被系统判定为“极度异常”，已自动上报至班主任及家长端。
+                    </p>
+                    <p style="margin-top:20px; font-weight:bold;">陆明瑶的独白：</p>
+                    <p>“林知易怎么可能弃考？他为了这次比赛，连续一个月每天只睡四个小时。他怎么可能在最后关头放弃？系统里一定还有别的记录……”</p>
+                    
+                    <!-- 提示玩家去查看源代码 -->
+                    <div style="margin-top:20px; padding:15px; background:#ffebe6; border:1px dashed #cc0000; text-align:center;">
+                        <p style="color:#cc0000; font-weight:bold; margin-bottom:10px;">💡 提示：网页似乎隐藏了什么信息。也许，该看看网页的“源代码”了。</p>
+                        <button onclick="openSourceCode()" style="padding:10px 20px; background:#333; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:14px;">查看网页源代码</button>
+                    </div>
+                </div>
+
+                <!-- 密码破解区 (首字母填空解谜) -->
+                <div class="password-area" id="passwordArea">
+                    <h3 style="color:#cc0000; margin-bottom:10px;">🔐 输入解密口令</h3>
+                    <p style="font-size:13px; color:#666; margin-bottom:15px;">根据源代码中的提示，输入正确口令以解锁隐藏模块。</p>
+                    <input type="text" id="passwordInput" placeholder="输入口令" onkeydown="if(event.key === 'Enter') checkPassword()">
+                    <button onclick="checkPassword()">解密</button>
+                    <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">口令错误。提示：最讨厌的科目英文首字母 + 失踪日期（4位数）</p>
+                </div>
+            </div>
+
+            <!-- 右侧侧边栏 -->
+            <div class="sidebar">
+                <div class="sidebar-title">目录 | Contents</div>
+                <ul>
+                    <li onclick="clickSidebar('合格发表')">合格发表</li>
+                    <li onclick="clickSidebar('合格点')">合格点</li>
+                    <li onclick="clickSidebar('结果报告书')">结果报告书</li>
+                    <li onclick="clickSidebar('考生历史轨迹')">考生历史轨迹</li>
+                    <li onclick="clickSidebar('心理评估报告')">心理评估报告</li>
+                </ul>
+
+                <div class="ad-box" onclick="clickAd('219万人都在卷！')">
+                    <div style="font-size:40px; margin-bottom:10px;">🎯</div>
+                    <div class="ad-text">219万人都在卷！</div>
+                    <div class="ad-sub">XX名师竞赛冲刺班<br>火热报名中</div>
+                </div>
+                
+                <div class="ad-box" style="border-color:#cc0000;" onclick="clickAd('一分干掉千人')">
+                    <div style="font-size:30px; margin-bottom:10px;">📈</div>
+                    <div class="ad-text" style="color:#cc0000;">一分干掉千人</div>
+                    <div class="ad-sub">你不努力，别人就会超越你</div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- 源代码弹窗 -->
+    <div class="modal-overlay" id="sourceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>index.html - 网页源代码 (开发者工具)</span>
+                <span class="close-btn" onclick="closeSourceCode()">[关闭]</span>
+            </div>
+            <div class="code-line"><span class="code-tag">&lt;!DOCTYPE html&gt;</span></div>
+            <div class="code-line"><span class="code-tag">&lt;html&gt;</span></div>
+            <div class="code-line"><span class="code-tag">&lt;head&gt;</span></div>
+            <div class="code-line">    <span class="code-tag">&lt;title&gt;</span>成绩查询 | 全国青少年学术竞赛评估中心<span class="code-tag">&lt;/title&gt;</span></div>
+            <div class="code-line">    <span class="code-comment">&lt;!-- </span></div>
+            <div class="code-line"><span class="code-comment">    开发者备注 (2026-07-12 03:00)：</span></div>
+            <div class="code-line"><span class="code-comment">    检测到考生 林知易 (ID: 20230101) 于 6 月弃考。</span></div>
+            <div class="code-line"><span class="code-comment">    系统日志显示，他在失踪前曾于凌晨 3:15 访问过 [隐藏模块: 心理评估报告]。</span></div>
+            <div class="code-line"><span class="code-comment">    该模块已被系统安全锁定。</span></div>
+            <div class="code-line"><span class="code-comment">    </span></div>
+            <div class="code-line"><span class="code-comment">    【解锁条件】：考生自行设置的口令。</span></div>
+            <div class="code-line"><span class="code-comment">    【线索提示】：口令 = 他最讨厌的考试科目（英文首字母，大写） + 他的失踪日期（MMDD）。</span></div>
+            <div class="code-line"><span class="code-comment">    例：若讨厌物理(Physics)、失踪于1月1日，则口令为 P0101。</span></div>
+            <div class="code-line"><span class="code-comment">    </span></div>
+            <div class="code-line"><span class="code-comment">    (注：他曾在日记里提过，数学是他一生的噩梦。失踪日期见上方浏览器历史记录。)</span></div>
+            <div class="code-line"><span class="code-comment">    --&gt;</span></div>
+            <div class="code-line"><span class="code-tag">&lt;/head&gt;</span></div>
+            <div class="code-line"><span class="code-tag">&lt;body&gt;</span></div>
+            <div class="code-line">    ...</div>
+        </div>
+    </div>
+
+    <!-- 全局提示 -->
+    <div class="toast" id="toast"></div>
 </div>
 
-<!-- 弹出提示 -->
-<div class="toast" id="toast"></div>
-
 <script>
-    // 点击关键词触发隐藏独白
-    function clickKeyword(keyword) {
-        let msg = '';
-        switch(keyword) {
-            case '林知易':
-                msg = '“林知易……他是我见过的，最努力、也最不快乐的人。”';
-                break;
-            case '数学国初赛':
-                msg = '“数学国初赛……那是他准备了整整一年的比赛。他怎么可能弃考？”';
-                break;
-            case '模拟考成绩':
-                msg = '“大人们总是这样，孩子都失踪了，还在谈论成绩。好像分数比人命更重要似的。”';
-                break;
-            case '陆明瑶':
-                msg = '“对，我叫陆明瑶。是他唯一的朋友。也是唯一一个，知道他有多痛苦的人。”';
-                break;
-        }
-        showToast(msg);
-    }
-
-    // 刷新按钮：点击后改变背景描述
-    let refreshCount = 0;
-    function refreshPage() {
-        refreshCount++;
-        const storyBox = document.getElementById('storyBox');
-        if (refreshCount === 1) {
-            showToast('【系统提示】浏览器已刷新。页面内容无变化。');
-        } else if (refreshCount === 2) {
-            showToast('【系统提示】你已经刷新了两次，这不会改变什么。');
-        } else if (refreshCount >= 3) {
-            showToast('【系统提示】不要浪费时间刷网页了。去找线索吧。');
-        }
-    }
-
-    // 显示提示框
+    // ================= 通用提示框 =================
     function showToast(msg) {
         const toast = document.getElementById('toast');
         toast.innerText = msg;
         toast.classList.add('show');
-        setTimeout(() => {
+        // 清除之前的定时器
+        if (window.toastTimer) clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
             toast.classList.remove('show');
-        }, 3000);
+        }, 3500);
     }
 
-    // 跳转第一章
-    function goToCompetitionSite() {
-        const viewport = document.querySelector('.viewport');
-        const urlBar = document.getElementById('urlBar');
-        urlBar.innerText = 'https://www.yacac.org.cn/results';
-        urlBar.style.color = '#00aaff';
-        viewport.style.opacity = '0';
-        viewport.style.transition = 'opacity 0.4s ease';
-        setTimeout(() => {
-            window.location.href = 'chapter1.html';
-        }, 400);
+    // ================= 顶部导航点击 =================
+    function clickNav(name) {
+        if (name === '成绩查询') {
+            showToast('【系统提示】您当前已在成绩查询页面。');
+        } else if (name === '首页') {
+            showToast('【系统提示】您正在访问首页。但这里除了成堆的成绩公告，什么都没有。');
+        } else if (name === '关于YACAC') {
+            showToast('【系统提示】YACAC成立于2010年，致力于为国家选拔顶尖理科人才。（官话套话，毫无营养）');
+        } else if (name === '联系我们') {
+            showToast('【系统提示】联系电话：400-XXX-XXXX。邮箱：yacac@edu.cn。非工作时间无人接听。');
+        }
     }
+
+    // ================= 侧边栏点击 =================
+    function clickSidebar(name) {
+        if (name === '心理评估报告') {
+            showToast('【系统警告】该模块为加密状态，需要特定口令才能访问。请先在主页面寻找线索。');
+        } else {
+            showToast(`【系统提示】您正在访问：${name}。该模块暂未开放，请先查询成绩。`);
+        }
+    }
+
+    // ================= 广告点击 =================
+    function clickAd(name) {
+        if (name === '219万人都在卷！') {
+            showToast('陆明瑶：“又是这种贩卖焦虑的广告。林知易肯定看了很多，才会觉得自己必须一直跑。”');
+        } else if (name === '一分干掉千人') {
+            showToast('陆明瑶：“一分干掉千人……在这样的环境里，谁敢停下来？”');
+        }
+    }
+
+    // ================= 表格单元格点击 =================
+    function clickCell(subject, month, score) {
+        showToast(`【系统提示】考生：林知易 | ${subject} ${month}成绩：${score}。成绩已归档，无详细记录。`);
+    }
+
+    // ================= 点击弃考单元格 =================
+    function clickAbsent() {
+        const clueBox = document.getElementById('clueBox');
+        clueBox.style.display = 'block';
+        setTimeout(() => {
+            clueBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
+
+    // ================= 查看源代码 =================
+    function openSourceCode() {
+        document.getElementById('sourceModal').style.display = 'flex';
+    }
+    function closeSourceCode() {
+        document.getElementById('sourceModal').style.display = 'none';
+        // 打开密码输入区
+        document.getElementById('passwordArea').style.display = 'block';
+        document.getElementById('passwordInput').focus();
+        showToast('【系统提示】已进入开发者模式。请在下方输入解密口令。');
+    }
+
+    // ================= 验证密码（首字母填空解谜） =================
+    // 正确答案：数学 MATH + 失踪日期 0711 => MATH0711
+    function checkPassword() {
+        const input = document.getElementById('passwordInput').value.trim().toUpperCase();
+        const errorMsg = document.getElementById('passwordError');
+        
+        if (input === 'MATH0711' || input === 'MATH0711') {
+            errorMsg.style.display = 'none';
+            showToast('【系统提示】口令正确！正在解密心理评估报告，即将进入第二章...');
+            
+            // 延迟跳转，模拟加载
+            setTimeout(() => {
+                const viewport = document.getElementById('viewport');
+                viewport.style.opacity = '0';
+                viewport.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    window.location.href = 'chapter2.html';
+                }, 500);
+            }, 1500);
+        } else {
+            errorMsg.style.display = 'block';
+            showToast('【系统提示】口令错误！请仔细阅读源代码中的提示。');
+        }
+    }
+
+    // 默认不展示密码区，点击源代码关闭后展示
 </script>
 
 </body>
