@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>林知易的个人博客 - 最终真相</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif; background-color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
+        #browser { width: 1100px; height: 850px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        
+        .browser-top { background: #1a1a1a; height: 40px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #333; }
+        .browser-dots { display: flex; gap: 6px; }
+        .browser-dots span { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
+        .browser-dots span:nth-child(2) { background: #ffbd2e; }
+        .browser-dots span:nth-child(3) { background: #27c93f; }
+        .url-bar { flex: 1; background: #000; height: 26px; margin-left: 20px; border-radius: 4px; border: 1px solid #333; font-size: 12px; color: #cc0000; display: flex; align-items: center; padding: 0 10px; font-family: monospace; transition: color 0.3s; }
+
+        .viewport { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; transition: opacity 0.5s ease; }
+
+        /* ========== 暗黑博客风 ========== */
+        .theme-personal { background: #121212; flex: 1; display: flex; flex-direction: column; }
+        .theme-personal .header { background: #1a1a1a; color: #fff; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .theme-personal .header-logo { font-size: 22px; font-weight: bold; color: #888; }
+        .theme-personal .main-content { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; }
+        .theme-personal .post-title { color: #cc0000; font-size: 24px; font-weight: bold; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid #cc0000; }
+        .theme-personal .post-date { font-size: 13px; color: #555; margin-bottom: 30px; font-family: monospace; }
+        .personal-post { background: #1e1e1e; padding: 30px; border-radius: 6px; font-family: 'Courier New', monospace; line-height: 2; color: #b0b0b0; border-left: 4px solid #cc0000; box-shadow: 0 0 15px rgba(204,0,0,0.1); }
+        .personal-post p { margin-bottom: 15px; }
+        .personal-post .highlight { color: #fff; font-weight: bold; }
+        .personal-post .danger { color: #cc0000; font-weight: bold; }
+        .personal-post .warm { color: #f0ad4e; font-weight: bold; }
+
+        .final-puzzle { display: block; margin-top: 40px; background: #1a1a1a; border: 1px dashed #cc0000; padding: 25px; border-radius: 6px; text-align: center; }
+        .final-puzzle h3 { color: #cc0000; font-size: 16px; margin-bottom: 15px; }
+        .final-puzzle p { font-size: 13px; color: #888; margin-bottom: 20px; }
+        .final-puzzle input { padding: 12px; font-size: 15px; width: 80%; border: 1px solid #444; background: #000; color: #cc0000; border-radius: 4px; font-family: monospace; text-align: center; letter-spacing: 2px; }
+        .final-puzzle button { padding: 12px 30px; background: #cc0000; color: #fff; border: none; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 15px; transition: 0.3s; }
+        .final-puzzle button:hover { background: #aa0000; }
+        .final-puzzle .error { color: #ff5f56; font-size: 13px; margin-top: 10px; display: none; }
+        .final-puzzle .hint { color: #666; font-size: 12px; margin-top: 15px; font-style: italic; }
+
+        /* ========== 隐藏日记 ========== */
+        .theme-diary { background: #1a1a1a; flex: 1; display: flex; flex-direction: column; display: none; }
+        .theme-diary .header { background: #0a0a0a; color: #fff; padding: 20px 30px; border-bottom: 1px solid #333; }
+        .theme-diary .header-logo { font-size: 20px; font-weight: bold; color: #cc0000; }
+        .theme-diary .main-content { padding: 40px 80px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .diary-title { font-size: 28px; color: #fff; margin-bottom: 15px; text-align: center; font-family: 'Courier New', monospace; }
+        .diary-subtitle { font-size: 13px; color: #666; margin-bottom: 40px; text-align: center; font-family: monospace; }
+        
+        .diary-entry { background: #222; padding: 30px; border-radius: 6px; margin-bottom: 25px; border-left: 4px solid #cc0000; line-height: 2; font-size: 15px; color: #c0c0c0; }
+        .diary-entry h4 { color: #cc0000; font-size: 15px; margin-bottom: 15px; font-family: monospace; border-bottom: 1px dashed #444; padding-bottom: 10px; }
+        .diary-entry p { margin-bottom: 15px; }
+        .diary-entry .highlight { color: #fff; font-weight: bold; }
+        .diary-entry .warm { color: #f0ad4e; }
+        .diary-entry .sad { color: #888; font-style: italic; }
+        
+        .final-words { text-align: center; padding: 40px 20px; margin-top: 20px; border-top: 1px dashed #444; }
+        .final-words p { font-size: 16px; color: #888; line-height: 2; }
+        .final-words .name { color: #cc0000; font-family: 'Courier New', monospace; font-size: 18px; margin-top: 20px; }
+
+        .continue-btn { display: none; text-align: center; padding: 30px; background: #0a0a0a; }
+        .continue-btn button { padding: 15px 50px; background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: #fff; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 30px; transition: 0.3s; box-shadow: 0 5px 20px rgba(255,107,107,0.3); }
+        .continue-btn button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,107,107,0.5); }
+
+        /* ========== 温柔关怀页 ========== */
+        .theme-final { background: linear-gradient(180deg, #fef9f3 0%, #ffe8e0 50%, #ffe8f0 100%); flex: 1; display: flex; flex-direction: column; display: none; }
+        .theme-final .main-content { padding: 60px 80px; max-width: 800px; margin: 0 auto; width: 100%; text-align: center; }
+        .final-icon { font-size: 60px; margin-bottom: 20px; animation: softPulse 3s ease-in-out infinite; }
+        @keyframes softPulse { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.05); opacity: 1; } }
+        .final-title { font-size: 28px; color: #d2694a; font-weight: bold; margin-bottom: 15px; letter-spacing: 2px; }
+        .final-divider { width: 60px; height: 3px; background: #d2694a; margin: 25px auto; border-radius: 2px; }
+        .final-text { font-size: 17px; line-height: 2.2; color: #5a4a42; margin-bottom: 25px; text-align: center; }
+        .final-text .warm { color: #d2694a; font-weight: bold; }
+        .final-text .soft { color: #a08878; font-style: italic; }
+        .final-quote { background: #fff; border-radius: 12px; padding: 30px; margin: 30px 0; box-shadow: 0 5px 25px rgba(210,105,74,0.15); border-left: 4px solid #d2694a; text-align: left; }
+        .final-quote p { font-size: 16px; line-height: 2; color: #5a4a42; margin-bottom: 12px; }
+        .final-quote p:last-child { margin-bottom: 0; }
+        .final-signature { font-size: 14px; color: #a08878; margin-top: 40px; line-height: 1.8; }
+        .final-signature .heart { color: #d2694a; }
+
+        .toast { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 12px 25px; border-radius: 6px; font-size: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: transform 0.4s ease, opacity 0.4s; z-index: 200; border-left: 4px solid #cc0000; max-width: 600px; opacity: 0; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div id="browser">
+    <div class="browser-top">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="url-bar" id="urlBar">https://www.lin-zhiyi-blog.com/final</div>
+    </div>
+    
+    <div class="viewport" id="viewport">
+        
+        <!-- ========== 视图1：遗书博客（含密码提示） ========== -->
+        <div class="theme-personal" id="view-blog">
+            <div class="header">
+                <div class="header-logo">林知易的个人博客</div>
+            </div>
+            <div class="main-content">
+                <div class="post-title">最后一条动态</div>
+                <div class="post-date">发布时间：2026-07-14 02:00 AM</div>
+                
+                <div class="personal-post">
+                    <p>我尽力了。</p>
+                    <p>但我知道，不管我怎么努力，我都成不了你们想要的那个天才。</p>
+                    <p>竞赛、排名、期望……这些东西像一座座大山，压得我喘不过气。</p>
+                    <p>荒岛求生的订单是假的，我没有去旅游。我只是想找个安静的地方，一个人待着。</p>
+                    <p class="highlight">海边的风很冷，但比教室里的空气要自由。</p>
+                    <p>对不起，陆明瑶。我知道你一定会找到这里。</p>
+                    <p class="danger">请告诉我的爸爸妈妈，还有老师们……我不欠任何人的成绩了。</p>
+                    
+                    <p style="margin-top:25px; border-top:1px dashed #333; padding-top:20px;">妈妈曾经问我，如果考不上最好的大学，我会不会恨她。</p>
+                    <p>我说不会。但我没告诉她的是——我恨的，是那个永远不够好的自己。</p>
+                    <p>其实，如果时间能倒流，我想对12岁的自己说一句话。</p>
+                    <p>那时候的我还不知道什么是焦虑，什么是排名。我只知道，解开一道难题的时候，心里是暖的。</p>
+                    <p>如果我能回到那一天，我会蹲下来，拍拍那个小男孩的肩膀，告诉他：</p>
+                    <p class="warm" style="font-size:18px; text-align:center; margin:20px 0;">「慢一点，没关系的。」</p>
+                    <p>这句话，也是我想对你们说的。</p>
+                    <p style="text-align:right; margin-top:20px; color:#cc0000;">—— 林知易，绝笔</p>
+                </div>
+                
+                <!-- 终极密码验证区 -->
+                <div class="final-puzzle" id="puzzleBox">
+                    <h3>🔐 隐藏文件验证</h3>
+                    <p>陆明瑶：“知易，你还有一份隐藏文档……我需要你留给我的最后一把钥匙。”</p>
+                    <p style="color:#cc0000; font-weight:bold;">请输入解锁隐藏文档的口令（提示：答案就在上面的遗书里）</p>
+                    <input type="text" id="finalInput" placeholder="请输入口令" onkeydown="if(event.key === 'Enter') checkFinalPassword()">
+                    <br>
+                    <button onclick="checkFinalPassword()">验证</button>
+                    <p class="error" id="finalError">口令错误。请认真阅读遗书，找到他最后想说的那句话。</p>
+                    <p class="hint">💭 提示：他想对12岁的自己说的，也是想对所有人说的那句话。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 视图2：隐藏日记（读完才知深意） ========== -->
+        <div class="theme-diary" id="view-diary">
+            <div class="header">
+                <div class="header-logo">🔒 隐藏文档已解锁：林知易的私人日记</div>
+            </div>
+            <div class="main-content">
+                <div class="diary-title">《致18岁的自己》</div>
+                <div class="diary-subtitle">—— 最后一次更新于 2026-07-13 23:58 ——</div>
+                
+                <div class="diary-entry">
+                    <h4>【关于热爱】</h4>
+                    <p>我记得小学的时候，第一次在数学课本上看到“鸡兔同笼”这个问题，我觉得好神奇。我可以自己想一整个下午，不觉得累。</p>
+                    <p class="warm">那时候的数学，是有趣的、是纯粹的。它就像一个大大的迷宫，我在里面玩得很开心。</p>
+                    <p>可是不知道从什么时候开始，数学变成了一张张卷子、一个个排名、一次次“你怎么才考这一点”的质问。</p>
+                    <p class="sad">我依然喜欢解出难题时的那个瞬间。但那瞬间的快乐，早已经被“你必须赢”的焦虑盖过去了。</p>
+                </div>
+
+                <div class="diary-entry">
+                    <h4>【关于老师的期望】</h4>
+                    <p>王老师对我特别好。他总说：“林知易，你是我们学校最有希望冲击金牌的人。”</p>
+                    <p>他说这话的时候，眼睛是亮的。我知道他是真心为我好。</p>
+                    <p class="sad">可是……我慢慢地、慢慢地，不敢告诉他我累了。因为我不想看到他眼睛里的光暗下来。</p>
+                    <p>我怕让他失望。我怕让所有人失望。</p>
+                </div>
+
+                <div class="diary-entry">
+                    <h4>【关于爸爸妈妈】</h4>
+                    <p>我妈每天早上五点起床给我做早餐。我爸周末放弃了所有应酬，开车接送我去补课。</p>
+                    <p>他们从来不说什么，但我能看到他们眼底的期待。那种期待，比任何一张卷子都重。</p>
+                    <p>有一次我在房间里哭，我妈推开门问我怎么了。我说“没事，就是有点累”。她说：“再坚持一下，考上最好的大学就好了。”</p>
+                    <p class="sad">我没敢说出口的是：可是妈妈，如果“坚持”本身就已经让我不想活了呢？</p>
+                </div>
+
+                <div class="diary-entry">
+                    <h4>【关于陆明瑶】</h4>
+                    <p>陆明瑶是我唯一的朋友。只有她会在我刷题到半夜的时候，给我发一张搞笑的表情包。</p>
+                    <p>只有她会拉着我去操场上走两圈，然后什么都不说。</p>
+                    <p class="warm">她让我觉得，好像我也可以只是一个普通的高中生，不需要永远是“第一名”。</p>
+                    <p>其实……我不是没有求生的欲望。我也想过，如果我坚持下去，会不会有一天真的好起来。</p>
+                    <p class="sad">可是每天早上睁开眼睛，想到又要面对那堆永远做不完的卷子，我就觉得，活着好像也没什么意义了。</p>
+                </div>
+
+                <div class="diary-entry">
+                    <h4>【最后想说的话】</h4>
+                    <p>写完这些，我反而平静了。</p>
+                    <p>我不是不爱这个世界。我只是太累了，累到没有力气再去爱了。</p>
+                    <p>如果可以，我希望我的离开，至少能让一些大人停下来想一想：</p>
+                    <p class="warm">你们到底是想让孩子“优秀”，还是想让孩子“幸福”？</p>
+                    <p>如果可以，请告诉我的爸爸妈妈，我不恨他们。我只是希望，他们下次再见到像我一样的孩子时，能先问一句：“你累不累？”而不是“你考了多少分？”</p>
+                    <p>如果可以，请告诉王老师，他是我最尊敬的老师。但请不要再对下一个学生说“你是我们唯一的希望”了。那份希望，太重了。</p>
+                    <p>如果可以，请告诉陆明瑶——</p>
+                    <p class="warm" style="font-size:16px;">谢谢你，在我最黑暗的时候，陪了我那么久。你要好好活着。慢慢地，活下去。</p>
+                </div>
+
+                <div class="final-words">
+                    <p>—— 林知易，绝笔 ——</p>
+                    <p class="name">2026年7月14日 凌晨 于海边</p>
+                </div>
+            </div>
+            
+            <div class="continue-btn" id="continueBtn">
+                <button onclick="showFinalMessage()">读完了。有些话，我想对你说……</button>
+            </div>
+        </div>
+
+        <!-- ========== 视图3：温柔关怀页 ========== -->
+        <div class="theme-final" id="view-final">
+            <div class="main-content">
+                <div class="final-icon">🌿</div>
+                
+                <div class="final-title">致此刻正在阅读的你</div>
+                <div class="final-divider"></div>
+                
+                <div class="final-text">
+                    谢谢你陪陆明瑶走完了这一段路。<br>
+                    谢谢你读完了林知易最后的日记。<br>
+                    我们知道，这个故事很沉。
+                </div>
+
+                <div class="final-quote">
+                    <p>🌱 如果你也是一个常常觉得“不够好”的人——</p>
+                    <p>请记得：<span class="warm">你已经很努力了。</span>真的。</p>
+                    <p>你的价值，不取决于任何一次考试，不取决于任何一张排名表，不取决于任何一个人的期待。</p>
+                    <p>你是独一无二的，无可替代的。</p>
+                </div>
+
+                <div class="final-quote">
+                    <p>💛 如果你正在被焦虑压得喘不过气——</p>
+                    <p>请给自己一个喘息的空间。</p>
+                    <p>允许自己休息，允许自己发呆，允许自己去做一些“没用”的事。</p>
+                    <p>跑步、画画、听一首歌、和朋友聊一次天……去做那些让你觉得舒服的事。</p>
+                    <p class="warm">去为你真正喜欢的事情努力，而不是为别人的期待而活。</p>
+                </div>
+
+                <div class="final-quote">
+                    <p>🤝 如果你身边也有像林知易一样的朋友——</p>
+                    <p>请多问一句：“你最近还好吗？”</p>
+                    <p>请多留一点耐心，多给一个拥抱。</p>
+                    <p>有时候，一句“我在这里”，就足以把一个站在悬崖边上的人，拉回来。</p>
+                </div>
+
+                <div class="final-text" style="margin-top:40px;">
+                    <span class="soft">这个游戏不是想让任何人感到愧疚或沉重。</span><br>
+                    <span class="soft">我们只是希望——</span><br>
+                    <span class="warm" style="font-size:19px;">你能对自己温柔一点。</span>
+                </div>
+
+                <div class="final-signature">
+                    <p>你不是一个人在走这条路。</p>
+                    <p><span class="heart">❤</span> 好好活着，慢慢长大。</p>
+                    <p style="margin-top:20px; font-size:12px; color:#c0a898;">—— 制作组，谨以此游戏献给每一个努力活着的人 ——</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+</div>
+
+<script>
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        if (window.toastTimer) clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+    }
+
+    // ================= 终极密码：慢一点 =================
+    // 密码提示直接出现在遗书正文中：
+    // "如果我能回到那一天，我会蹲下来，拍拍那个小男孩的肩膀，告诉他：「慢一点，没关系的。」"
+    // 玩家认真阅读遗书即可发现。
+    function checkFinalPassword() {
+        const input = document.getElementById('finalInput').value.trim();
+        const errorMsg = document.getElementById('finalError');
+        
+        // 接受的答案形式（容错）
+        if (input === '慢一点' || input === '慢一点，没关系的' || input === '慢一点没关系的') {
+            errorMsg.style.display = 'none';
+            showToast('【系统提示】口令正确！正在解密隐藏文档……');
+            
+            setTimeout(() => {
+                document.getElementById('urlBar').innerText = 'https://www.lin-zhiyi-blog.com/secret';
+                document.getElementById('urlBar').style.color = '#f0ad4e';
+                document.getElementById('view-blog').style.display = 'none';
+                document.getElementById('view-diary').style.display = 'flex';
+                document.getElementById('viewport').scrollTop = 0;
+                
+                setTimeout(() => {
+                    document.getElementById('continueBtn').style.display = 'block';
+                }, 500);
+            }, 1500);
+        } else {
+            errorMsg.style.display = 'block';
+            showToast('【系统提示】口令错误。请认真阅读遗书，找到他最后想说的那句话。');
+        }
+    }
+
+    // ================= 显示最终关怀页 =================
+    function showFinalMessage() {
+        const viewport = document.getElementById('viewport');
+        viewport.style.opacity = '0';
+        
+        setTimeout(() => {
+            document.getElementById('urlBar').innerText = 'https://www.lin-zhiyi-blog.com/for-you';
+            document.getElementById('urlBar').style.color = '#d2694a';
+            document.getElementById('view-diary').style.display = 'none';
+            document.getElementById('view-final').style.display = 'flex';
+            viewport.scrollTop = 0;
+            setTimeout(() => { viewport.style.opacity = '1'; }, 50);
+        }, 500);
+    }
+</script>
+
+</body>
+</html>
