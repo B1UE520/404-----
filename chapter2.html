@@ -108,7 +108,7 @@
                     <p>考生姓名：林知易 | 学号：20230101 | 评估日期：2026-05-21</p>
                     <p>本系统综合该生近半年的竞赛表现、在校出勤率及日常行为轨迹，生成以下评估结论：</p>
                     <p>该生长期处于极高度紧张状态，具有明显的完美主义倾向。近期表现出强烈的逃避心理和情绪耗竭（Burnout）症状。建议家长及校方密切关注该生心理状态，必要时介入干预。</p>
-                    <p>以下附录为该生在系统内提交的匿名日记片段，供心理老师参考：</p>
+                    <p>以下附录为该生笔记片段，供心理老师参考：</p>
                 </div>
 
                 <!-- 活动轨迹列表（超链接解谜起点） -->
@@ -139,22 +139,22 @@
                 <div class="diary-box" id="diaryBox">
                     <h3>⚠️ 截获的匿名日记片段</h3>
                     <p><span class="highlight-first">飞</span>鸟掠过海面，我很羡慕它们能自由飞翔。</p>
-                    <p><span class="highlight-first">猪</span>一样的我，却只能被关在教室里拼命刷题。</p>
+                    <p><span class="highlight-first">猪</span>一样的我，对抗刷不完的题海长廊。</p>
                     <p><span class="highlight-first">旅</span>行的意义，或许就是让我暂时逃离这一切。</p>
                     <p><span class="highlight-first">行</span>走在无人的荒岛，我才能感受到一丝喘息的空间。</p>
                     
                     <p style="margin-top:20px; color:#666; font-size:13px; font-style:normal; border-top:1px dashed #ccc; padding-top:15px;">
-                        <em>陆明瑶的独白：“这是他写的藏头诗吗？每句话的第一个字连起来是……‘飞猪旅行’？他什么时候想去旅游了？”</em>
+                        <em>陆明瑶的独白：“林猪易心情怎么差竟然不告诉我！话说...他什么时候想去旅游了？”</em>
                     </p>
                 </div>
 
                 <!-- 密码破解区（藏头诗解谜） -->
                 <div class="password-area" id="passwordArea">
                     <h3 style="color:#cc0000; margin-bottom:10px;">🔐 提取日记中的关键信息</h3>
-                    <p style="font-size:13px; color:#666; margin-bottom:15px;">请将日记每句的第一个字连起来，输入解锁密码（4个字）。</p>
+                    <p style="font-size:13px; color:#666; margin-bottom:15px;">请输入解锁密码（4个字）。</p>
                     <input type="text" id="passwordInput" placeholder="请输入4字密码" onkeydown="if(event.key === 'Enter') checkPassword()">
                     <button onclick="checkPassword()">解锁</button>
-                    <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">密码错误，请仔细阅读日记片段。</p>
+                    <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">密码错误，请仔细阅读片段。</p>
                 </div>
             </div>
 
@@ -264,7 +264,7 @@
             }, 1500);
         } else {
             errorMsg.style.display = 'block';
-            showToast('【系统提示】密码错误！提示：提取日记每句的第一个字。');
+            showToast('【系统提示】密码错误！第一个字。');
         }
     }
 </script>
