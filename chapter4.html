@@ -117,29 +117,29 @@
                 
                 <div class="comment" onclick="clickComment('椰子')">
                     <span class="author">老王</span><span class="date">2026-07-15 18:00</span>
-                    <p>今天来了个戴眼镜的高中生，叫林知易。让他搭帐篷，他问我有没有说明书；让他生火，他试图用椰子壳钻木取火，结果把椰子砸在了自己头上。😂</p>
+                    <p>今天来了个戴眼镜的高中生，叫林知易。让他搭帐篷，他问我有没有说明书；让他生火，他试图用椰子壳钻木取火，真乃神人也。😂</p>
                 </div>
                 
                 <div class="comment" onclick="clickComment('海鸥')">
                     <span class="author">老王</span><span class="date">2026-07-16 12:00</span>
-                    <p>林知易早上试图跟海鸥分享他的面包，结果海鸥把他整个面包抢走了。他追着海鸥跑了半个沙滩，最后摔了一跤，眼镜都飞了。笑死我了。</p>
+                    <p>还是林知易，这小子早上试图跟海鸥分享他的面包，结果海鸥把他整个面包抢走了。他追着海鸥跑了半个沙滩，最后摔了一跤，眼镜都飞了。笑死我了。</p>
                 </div>
 
                 <div class="comment clickable-comment" id="clickableComment" onclick="showClue()">
-                    <span class="author">匿名网友（陆明瑶）</span><span class="date">2026-07-17 09:00</span>
-                    <p style="color:#d9534f; font-weight:bold;">请问这个叫林知易的现在在哪？我是他同学，他家长快急疯了！（点击查看回复）</p>
+                    <span class="author">易杯瑶瑶奶昔</span><span class="date">2026-07-17 09:00</span>
+                    <p style="color:#d9534f; font-weight:bold;">大叔好，请问这个叫林知易的现在在哪呀？我是他同学，他家长快急疯了！（点击查看回复）</p>
                 </div>
 
                 <div class="clue-box" id="clueBox">
                     <h3>老王的回复</h3>
                     <p id="replyText">“哎呀！昨天他吃没烤熟的<strong>螃蟹</strong>，拉肚子拉虚脱了，我们联系了当地救援队，现在人在镇上医院呢！不过人没事，就是有点丢人。”</p>
-                    <p style="color:#666; font-size:13px;">陆明瑶的独白：“……所以，他失踪这几天，其实是在荒岛上跟椰子、海鸥和螃蟹搏斗？这个笨蛋……”</p>
+                    <p style="color:#666; font-size:13px;">os：“……所以，他失踪这几天，其实是在荒岛上跟椰子、海鸥和螃蟹搏斗？这个笨蛋……”</p>
                     
                     <p style="margin-top:20px; font-weight:bold; color:#d9534f;">🔍 线索提示：老王在昨晚的录音里记录了一段奇怪的声音，似乎是林知易留下的求救信号。</p>
                     <div class="audio-player" onclick="playMorseCode()">
                         <div style="display:flex; align-items:center;">
                             <span class="play-icon">▶</span>
-                            <span class="text">播放荒岛现场录音（爆音解谜）</span>
+                            <span class="text">播放荒岛现场录音(注意音量哦~）</span>
                         </div>
                         <span style="font-size:12px;">点击播放</span>
                     </div>
@@ -156,10 +156,10 @@
 
                     <div class="password-area" id="passwordArea">
                         <h3 style="color:#f0ad4e; margin-bottom:10px;">🔐 输入摩斯密码解码结果</h3>
-                        <p style="font-size:13px; color:#666; margin-bottom:15px;">根据录音中长短音的组合，输入解码后的英文单词（4个字母，不区分大小写）。</p>
+                        <p style="font-size:13px; color:#666; margin-bottom:15px;">根据录音中长短音的组合，输入解码后的英文单词</p>
                         <input type="text" id="passwordInput" placeholder="输入英文单词" onkeydown="if(event.key === 'Enter') checkPassword()">
                         <button onclick="checkPassword()">解码</button>
-                        <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">解码错误，请仔细听录音并对照摩斯密码表。</p>
+                        <p id="passwordError" style="color:#cc0000; font-size:13px; margin-top:10px; display:none;">解码错误，请仔细听哦</p>
                     </div>
                 </div>
             </div>
@@ -183,7 +183,7 @@
                 </div>
                 
                 <div style="text-align:center; margin-top:30px;">
-                    <button class="btn btn-news" onclick="showEndingA()">结局A：荒岛乌龙（点击触发）</button>
+                    <button class="btn btn-news" onclick="showEndingA()">成就：荒岛行难</button>
                 </div>
             </div>
         </div>
@@ -191,21 +191,21 @@
         <!-- ================= 视图3：好结局 ================= -->
         <div class="theme-ending" id="view-ending">
             <div class="header">
-                <div class="header-logo">🎉 结局A：荒岛乌龙</div>
+                <div class="header-logo">🎉 成就：荒岛行难</div>
             </div>
             <div class="main-content">
-                <h2>🎉 恭喜达成结局A：荒岛乌龙！</h2>
+                <h2>🎉 恭喜达成成就：荒岛行难！</h2>
                 <p>
                     林知易被家长从医院接回了家。虽然他在全校面前因为“吃坏肚子而在沙滩上打滚”出了名，但他终于露出了久违的、没心没肺的笑容。
                 </p>
                 <p>
-                    陆明瑶把他的荒岛日记发到了班级群里，大家笑了整整一周。学校的竞赛班也因此暂时停课了一周，组织了一次真正的春游。
+                    陆明瑶把老王的博客发到了班级群里，大家笑了整整一周。学校的竞赛班也因此暂时停课了一周，组织了一次真正的春游。
                 </p>
                 <p style="font-weight:bold; text-align:center; color:#333; margin-top:30px;">
                     但是，这真的是全部的真相吗？
                 </p>
                 <div style="text-align:center; margin-top:20px; border-top:1px dashed #ccc; padding-top:20px;">
-                    <button class="btn btn-ending" onclick="goToHiddenRoute()">等等，我好像在订单里漏掉了什么……</button>
+                    <button class="btn btn-ending" onclick="goToHiddenRoute()">等等，我好像漏掉了什么……</button>
                 </div>
             </div>
         </div>
@@ -238,7 +238,7 @@
     // ================= 博客评论点击 =================
     function clickComment(topic) {
         if (topic === '椰子') { showToast('陆明瑶：“用椰子壳钻木取火……他真是个学术派。不过，这确实很像他能干出来的事。”'); }
-        else if (topic === '海鸥') { showToast('陆明瑶：“被海鸥抢面包，还追着跑……他平时在教室里连大声说话都不敢，居然追海鸥？”'); }
+        else if (topic === '海鸥') { showToast('陆明瑶：“被海鸥抢面包，还追着跑……他平时在教室里连大声说话都不敢，居然追海鸥？这家伙...”'); }
     }
 
     // ================= 显示老王回复与录音 =================
@@ -330,7 +330,7 @@
             }, 1500);
         } else {
             errorMsg.style.display = 'block';
-            showToast('【系统提示】解码错误！请听录音中的长短音，并对照摩斯密码表。');
+            showToast('【系统提示】解码错误！请仔细听哦');
         }
     }
 
